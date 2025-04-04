@@ -1,0 +1,113 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/cnnClassifier/pipeline/stage_01_data_ingestion.py
+    deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: 4c5cac9c0dc3cef62abce8a52af69332
+      size: 589
+    - path: src/cnnClassifier/pipeline/stage_01_data_ingestion.py
+      hash: md5
+      md5: 7b28365d1fbf24012e6db0c653f66187
+      size: 908
+    outs:
+    - path: artifacts/data_ingestion/realwaste-main/RealWaste
+      hash: md5
+      md5: c037f76224ef4a6a219ad60815e4b33c.dir
+      size: 688308374
+      nfiles: 4752
+  prepare_base_model:
+    cmd: python src/cnnClassifier/pipeline/stage_02_prepare_base_model.py
+    deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: 4c5cac9c0dc3cef62abce8a52af69332
+      size: 589
+    - path: src/cnnClassifier/pipeline/stage_02_prepare_base_model.py
+      hash: md5
+      md5: 6b862d6ba373e9aebf32c62c1e85e55b
+      size: 989
+    params:
+      params.yaml:
+        CLASSES: 9
+        IMAGE_SIZE:
+        - 224
+        - 224
+        - 3
+        INCLUDE_TOP: false
+        LEARNING_RATE: 0.01
+        WEIGHTS: imagenet
+    outs:
+    - path: artifacts/prepare_base_model
+      hash: md5
+      md5: f6804bed3a0ad98b9348d57f110f8cc1.dir
+      size: 118775701
+      nfiles: 2
+  training:
+    cmd: python src/cnnClassifier/pipeline/stage_03_model_trainer.py
+    deps:
+    - path: artifacts/data_ingestion/realwaste-main/RealWaste
+      hash: md5
+      md5: c037f76224ef4a6a219ad60815e4b33c.dir
+      size: 688308374
+      nfiles: 4752
+    - path: artifacts/prepare_base_model
+      hash: md5
+      md5: f6804bed3a0ad98b9348d57f110f8cc1.dir
+      size: 118775701
+      nfiles: 2
+    - path: config/config.yaml
+      hash: md5
+      md5: 4c5cac9c0dc3cef62abce8a52af69332
+      size: 589
+    - path: src/cnnClassifier/pipeline/stage_03_model_trainer.py
+      hash: md5
+      md5: 5146e47ad0a94773322aa46a505f3ad4
+      size: 920
+    params:
+      params.yaml:
+        AUGMENTATION: true
+        BATCH_SIZE: 16
+        EPOCHS: 1
+        IMAGE_SIZE:
+        - 224
+        - 224
+        - 3
+    outs:
+    - path: artifacts/training/model.keras
+      hash: md5
+      md5: 93bcbfed3a779cdcba4d99471684134a
+      size: 59843741
+  evaluation:
+    cmd: python src/cnnClassifier/pipeline/stage_04_model_evaluation.py
+    deps:
+    - path: artifacts/data_ingestion/realwaste-main/RealWaste
+      hash: md5
+      md5: c037f76224ef4a6a219ad60815e4b33c.dir
+      size: 688308374
+      nfiles: 4752
+    - path: artifacts/training/model.keras
+      hash: md5
+      md5: 93bcbfed3a779cdcba4d99471684134a
+      size: 59843741
+    - path: config/config.yaml
+      hash: md5
+      md5: 4c5cac9c0dc3cef62abce8a52af69332
+      size: 589
+    - path: src/cnnClassifier/pipeline/stage_04_model_evaluation.py
+      hash: md5
+      md5: e5acfe1c4e9e0a3f116bebf9898cb1ee
+      size: 938
+    params:
+      params.yaml:
+        BATCH_SIZE: 16
+        IMAGE_SIZE:
+        - 224
+        - 224
+        - 3
+    outs:
+    - path: scores.json
+      hash: md5
+      md5: 3d83acd2d07c8ea2a8deee76d96106d1
+      size: 74

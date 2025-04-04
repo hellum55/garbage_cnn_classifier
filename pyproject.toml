@@ -7,7 +7,14 @@ authors = ["hellum55 <hellum.christian@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
+<<<<<<< HEAD
 python = ">=3.12,<3.13"
+=======
+python = "3.12"
+tensorflow = "2.17.1"
+pandas = "^2.2.3"
+numpy = "1.26.4"
+>>>>>>> b49b3ff359eed99ab52d315ffbdad21b73b02919
 gdown = "^5.2.0"
 dvc = "^3.59.1"
 mlflow = "^2.21.2"
